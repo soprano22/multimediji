@@ -30,7 +30,7 @@
 
 1. Klonirajte repozitorijum:
    ```bash
-   git clone [https://github.com/soprano22/multimediji.git](https://github.com/soprano22/multimediji.git)
+   git clone https://github.com/soprano22/multimediji.git
 
 2. Pozicionirajte se u folder:
    ```bash
