@@ -648,7 +648,6 @@
     }
     .map-frame {
       width: 100%;
-      height: 450px;              /* Equal visual height on desktop */
       border-radius: var(--border-radius);
       background: var(--medical-blue-light);
       box-shadow: var(--shadow);
