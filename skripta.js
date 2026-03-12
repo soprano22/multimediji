@@ -9,7 +9,6 @@ function scrollWithOffset(e) {
         const y = target.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
-      // Zatvaranje menija i reset skrola pozadine
       document.getElementById('mobile-menu').classList.remove('open');
       document.body.style.overflow = '';
     }
@@ -21,18 +20,24 @@ function scrollWithOffset(e) {
   
   // 2. Mobile menu logika
   const mobileMenu = document.getElementById('mobile-menu');
+  const openBtn = document.getElementById('mobile-menu-open');
+  const closeBtn = document.getElementById('mobile-menu-close');
   
-  document.getElementById('mobile-menu-open').onclick = function() {
-    mobileMenu.classList.add('open');
-    document.body.style.overflow = 'hidden';
+  if(openBtn) {
+    openBtn.onclick = function() {
+      mobileMenu.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
   }
   
-  document.getElementById('mobile-menu-close').onclick = function() {
-    mobileMenu.classList.remove('open');
-    setTimeout(() => { document.body.style.overflow = ''; }, 300);
+  if(closeBtn) {
+    closeBtn.onclick = function() {
+      mobileMenu.classList.remove('open');
+      setTimeout(() => { document.body.style.overflow = ''; }, 300);
+    }
   }
   
-  // 3. ScrollSpy: Automatsko podvlačenje stavki dok skroluješ
+  // 3. ScrollSpy: Podvlačenje stavki
   const observerOptions = {
     root: null,
     rootMargin: '-25% 0px -65% 0px',
@@ -53,18 +58,27 @@ function scrollWithOffset(e) {
     });
   };
   
-  const observer = new IntersectionObserver(observerCallback, observerOptions);
-  document.querySelectorAll('section[id]').forEach(section => observer.observe(section));
+  const spyObserver = new IntersectionObserver(observerCallback, observerOptions);
+  document.querySelectorAll('section[id]').forEach(section => spyObserver.observe(section));
   
-  // 4. Fade-in on scroll
-  function fadeInOnScroll() {
-    document.querySelectorAll('.fade-up').forEach(el => {
-      let rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.95) el.classList.add('visible');
+  // 4. Fade-in on scroll (SADA SE PONAVLJA)
+  const fadeOptions = {
+    threshold: 0.1,
+    rootMargin: "0px 0px -50px 0px" // Aktivira se malo pre nego što element dotakne dno
+  };
+  
+  const fadeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      } else {
+        // UKLANJA KLASU kada element izađe iz vidokruga da bi se animacija ponovila
+        entry.target.classList.remove('visible');
+      }
     });
-  }
-  document.addEventListener('scroll', fadeInOnScroll, { passive: true });
-  window.addEventListener('DOMContentLoaded', fadeInOnScroll);
+  }, fadeOptions);
+  
+  document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
   
   // 5. Before & After Slider Logic
   (function() {
@@ -93,35 +107,26 @@ function scrollWithOffset(e) {
         return ((clampedX - rect.left) / rect.width) * 100;
       }
   
-      function startDrag(e) {
-        dragging = true;
-        document.body.style.userSelect = 'none';
-        applySlider(getPercentFromEvent(e));
+      if (handle) {
+        handle.addEventListener('mousedown', () => dragging = true);
+        handle.addEventListener('touchstart', () => dragging = true);
       }
   
-      function moveDrag(e) {
+      window.addEventListener('mousemove', (e) => {
         if (!dragging) return;
         applySlider(getPercentFromEvent(e));
-      }
+      });
   
-      function stopDrag() {
-        dragging = false;
-        document.body.style.userSelect = '';
-      }
+      window.addEventListener('touchmove', (e) => {
+        if (!dragging) return;
+        applySlider(getPercentFromEvent(e));
+      }, { passive: false });
   
-      if (handle) {
-        handle.addEventListener('mousedown', startDrag);
-        handle.addEventListener('touchstart', startDrag, { passive: false });
-      }
-      window.addEventListener('mousemove', moveDrag);
-      window.addEventListener('touchmove', moveDrag, { passive: false });
-      window.addEventListener('mouseup', stopDrag);
-      window.addEventListener('touchend', stopDrag);
+      window.addEventListener('mouseup', () => dragging = false);
+      window.addEventListener('touchend', () => dragging = false);
   
       if (range) {
-        range.addEventListener('input', function(e) {
-          applySlider(e.target.value);
-        });
+        range.addEventListener('input', (e) => applySlider(e.target.value));
       }
       applySlider(range ? range.value : 50);
     });
