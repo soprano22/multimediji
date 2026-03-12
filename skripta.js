@@ -21,21 +21,29 @@ function scrollWithOffset(e) {
     link.addEventListener("click", scrollWithOffset);
   });
   // Mobile menu logic
-  document.getElementById('mobile-menu-open').onclick = function() {
-    document.getElementById('mobile-menu').classList.add('open');
-    document.body.style.overflow='hidden';
-  }
-  document.getElementById('mobile-menu-close').onclick = function() {
-    document.getElementById('mobile-menu').classList.remove('open');
-    document.body.style.overflow='';
-  }
-  // Close on mobile link click
-  document.querySelectorAll('.mobile-menu .scroll-link').forEach(link=>{
-    link.onclick = function() {
-      document.getElementById('mobile-menu').classList.remove('open');
-      document.body.style.overflow='';
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    document.getElementById('mobile-menu-open').onclick = function() {
+    mobileMenu.classList.add('open');
+    // Zaključavamo skrol pozadine da korisnik ne skroluje sajt dok je meni otvoren
+    document.body.style.overflow = 'hidden';
     }
-  });
+
+    document.getElementById('mobile-menu-close').onclick = function() {
+    mobileMenu.classList.remove('open');
+    // Vraćamo skrol tek nakon što se završi CSS tranzicija (opciono, ali lepše)
+    setTimeout(() => {
+        document.body.style.overflow = '';
+    }, 300); // 300ms je trajanje transition-a iz CSS-a
+    }
+
+    // Close on mobile link click (popravka da radi glatko sa scroll-om)
+    document.querySelectorAll('.mobile-menu .scroll-link').forEach(link => {
+    link.onclick = function() {
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    });
 
   // Simple fade-in on scroll
   function fadeInOnScroll() {

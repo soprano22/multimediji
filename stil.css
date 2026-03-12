@@ -91,13 +91,14 @@
       .navbar nav { display: none; }
       .navbar .mobile-toggle { display: block; }
     }
+    
     .mobile-menu {
-      display: none;
+      /* Osnovna pozicija i stilovi */
       position: fixed;
       z-index: 60;
-      top: 0; left: 0;
-      right: 0; bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: var(--white);
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
@@ -105,9 +106,45 @@
       gap: 2rem;
       font-size: 2rem;
       font-weight: bold;
-      transition: opacity .16s;
+    
+      /* --- ANIMACIJA GDE SE MENI POJAVLJUJE --- */
+      opacity: 0;           /* Nevidljiv */
+      visibility: hidden;  /* Onemogućava klikove dok je zatvoren */
+      transform: translateY(-10px); /* Blago pomeren na gore */
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Glatko kretanje */
     }
-    .mobile-menu.open { display: flex; }
+    
+    /* Stanje kada klikneš na dugme (JS dodaje klasu .open) */
+    .mobile-menu.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0); /* Vraća se na početnu poziciju */
+    }
+
+    .mobile-menu a {
+      color: var(--medical-blue) !important;
+      padding: 10px 4px;
+      border-bottom: 2px solid transparent;
+      transition: border-color .16s, opacity 0.4s, transform 0.4s;
+      
+      /* Početno stanje linkova */
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    /* Kada se meni otvori, linkovi postaju vidljivi */
+    .mobile-menu.open a {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Redosled pojavljivanja (Stagger effect) */
+    .mobile-menu.open a:nth-child(1) { transition-delay: 0.1s; }
+    .mobile-menu.open a:nth-child(2) { transition-delay: 0.15s; }
+    .mobile-menu.open a:nth-child(3) { transition-delay: 0.2s; }
+    .mobile-menu.open a:nth-child(4) { transition-delay: 0.25s; }
+
+
     .mobile-menu a {
       color: var(--medical-blue) !important;
       padding: 10px 4px;
